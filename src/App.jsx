@@ -1,15 +1,17 @@
-import React from 'react'
 import Button from '@mui/material/Button'
 import AccessAlarmIcon from '@mui/icons-material/AccessAlarm'
 import ThreeDRotation from '@mui/icons-material/ThreeDRotation'
 import HomeIcon from '@mui/icons-material/Home'
 import { pink } from '@mui/material/colors'
+import Typography from '@mui/material/Typography'
 
 
 function App() {
   return (
     <>
       <div>Manhnq dev</div>
+      <Typography variant='body2' color="text.secondary">Test Typography</Typography>
+
       <Button variant='text'>Hello World</Button>
       <Button variant='contained'>Contained</Button>
       <Button variant='outlined'>Outlined</Button>

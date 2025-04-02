@@ -4,14 +4,17 @@ module.exports = {
     'eslint:recommended',
     'plugin:react/recommended',
     'plugin:react/jsx-runtime',
-    'plugin:react-hooks/recommended'
+    'plugin:react-hooks/recommended',
+    'plugin:import/errors',
+    'plugin:import/warnings'
   ],
   parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
   settings: { react: { version: '18.2' } },
   plugins: [
     'react',
     'react-hooks',
-    'react-refresh'
+    'react-refresh',
+    'import'
   ],
   rules: {
     'react-refresh/only-export-components': 'warn',
@@ -19,7 +22,7 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'warn',
     'react/prop-types': 0,
     'react/display-name': 0,
-    "no-restricted-imports": [
+    'no-restricted-imports': [
       "error",
       {
         "patterns": ["@mui/*/*/*"]
@@ -42,7 +45,7 @@ module.exports = {
     'keyword-spacing': 1,
     'comma-dangle': 1,
     'comma-spacing': 1,
-    'arrow-spacing': 1
-
+    'arrow-spacing': 1,
+    'import/no-unresolved': 'error'
   },
 }
