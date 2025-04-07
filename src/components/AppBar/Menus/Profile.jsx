@@ -12,6 +12,7 @@ import PersonAdd from '@mui/icons-material/PersonAdd'
 import Settings from '@mui/icons-material/Settings'
 import Logout from '@mui/icons-material/Logout'
 
+
 function Profile() {
 
   const [anchorEl, setAnchorEl] = React.useState(null)
@@ -49,20 +50,20 @@ function Profile() {
           'aria-labelledby': 'basic-button-profile'
         }}
       >
-        <MenuItem>
+        <MenuItem value='Profile' onClick={handleClose} >
           <Avatar sx={{ width: 28, height: 28, mr: 2 }} /> Profile
         </MenuItem>
-        <MenuItem>
+        <MenuItem value='My Account' onClick={handleClose} >
           <Avatar sx={{ width: 28, height: 28, mr: 2 }} /> My account
         </MenuItem>
         <Divider />
-        <MenuItem>
+        <MenuItem value='Add another account' onClick={handleClose}>
           <ListItemIcon>
             <PersonAdd fontSize="small" />
           </ListItemIcon>
           Add another account
         </MenuItem>
-        <MenuItem>
+        <MenuItem value='Settings' onClick={handleClose}>
           <ListItemIcon>
             <Settings fontSize="small" />
           </ListItemIcon>

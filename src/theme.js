@@ -59,7 +59,7 @@ const theme = extendTheme({
           fontSize: '0.875rem'
         })
       }
-    },
+    }
   }
 })
 
