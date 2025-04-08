@@ -24,7 +24,7 @@ function Workspaces() {
     setAnchorEl(null)
   }
   return (
-    <Box sx={{ }}>
+    <Box>
       <Button
         sx={{
           color: 'white'
