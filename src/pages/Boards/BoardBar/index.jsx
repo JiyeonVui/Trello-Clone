@@ -10,6 +10,7 @@ import FilterListIcon from '@mui/icons-material/FilterList'
 import { Tooltip } from '@mui/material'
 import Button from '@mui/material/Button'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
+import { capitalizeFirstLetter } from '~/utils/formatters'
 
 
 const MENU_STYLES = {
@@ -26,7 +27,9 @@ const MENU_STYLES = {
   }
 }
 
-function BoardBar() {
+function BoardBar({ board }) {
+
+
   return (
     <Box sx={{
       width: '100%',
@@ -37,22 +40,24 @@ function BoardBar() {
       gap: 2,
       paddingX: 2,
       overflowX: 'auto',
-      bgcolor: (themes) => (themes.palette.mode === 'dark' ? '#34495e' : '#1976d2'),
-      borderBottom: '2px solid rgb(255, 255, 255)'
+      bgcolor: (themes) => (themes.palette.mode === 'dark' ? '#34495e' : '#1976d2')
     }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         <Chip
           sx={MENU_STYLES}
           icon={<DashboardIcon />}
-          label="Manh nguyen Dev MERN Stack Board"
+          label={board?.title}
           clickable
         />
-        <Chip
-          sx={MENU_STYLES}
-          icon={<VpnLockIcon />}
-          label="Public/Private Workspace"
-          clickable
-        />
+        {board?.type &&
+          <Chip
+            sx={MENU_STYLES}
+            icon={<VpnLockIcon />}
+            label={ capitalizeFirstLetter(board?.type)}
+            clickable
+          />
+        }
+
         <Chip
           sx={MENU_STYLES}
           icon={<AddToDriveIcon />}
