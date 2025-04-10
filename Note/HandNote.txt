@@ -1,2 +1,5 @@
 Tìm hiểu thêm 
 map() "listColumn"
+Tranfrom and Translate
+
+UseEffect
