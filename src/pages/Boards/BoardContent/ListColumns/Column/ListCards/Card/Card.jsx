@@ -7,6 +7,8 @@ import CardMedia from '@mui/material/CardMedia'
 import GroupIcon from '@mui/icons-material/Group'
 import CommentIcon from '@mui/icons-material/Comment'
 import AttachmentIcon from '@mui/icons-material/Attachment'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 function Card({ card }) {
 
@@ -14,8 +16,25 @@ function Card({ card }) {
     return !!card?.memberIds?.length > 0 || !!card?.comments?.length > 0 || card?.attachments?.length > 0
   }
 
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: card._id,
+    data: { ...card }
+  })
+
+  const dndKitCardStyles = {
+    /**
+     * Nếu sử dụng CSS.Transform như docs sẽ lỗi kiểu stretch
+     * https://github.com/clauderic/dnd-kit/issues/117
+     */
+    transform: CSS.Translate.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1
+    // touchAction:'none'
+  }
+
   return (
     <MuiCard
+      ref={setNodeRef} style={dndKitCardStyles} {...attributes} {...listeners}
       sx={{
         cursor: 'pointer',
         boxShadow: '0 1px 1px rgpa(0, 0, 0, 0.2)',
