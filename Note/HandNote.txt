@@ -3,3 +3,9 @@ map() "listColumn"
 Tranfrom and Translate
 
 UseEffect
+
+Nghiên cứu thêm về rect, => size of element and position
+
+Nghiên cứu thêm về filter
+
+Nghiên cứu thêm về toSpliced and Splice
