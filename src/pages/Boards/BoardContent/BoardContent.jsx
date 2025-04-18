@@ -1,10 +1,10 @@
 import Box from '@mui/material/Box'
 import ListColumns from './ListColumns/ListColumns'
 import { mapOrder } from '~/utils/sorts'
-import { DndContext, PointerSensor, MouseSensor, TouchSensor, useSensor, useSensors, DragOverlay, defaultDropAnimationSideEffects } from '@dnd-kit/core'
+import { DndContext, PointerSensor, MouseSensor, TouchSensor, useSensor, useSensors, DragOverlay, defaultDropAnimationSideEffects, closestCorners } from '@dnd-kit/core'
 import { useEffect, useState } from 'react'
-import { arrayMove, defaultAnimateLayoutChanges } from '@dnd-kit/sortable'
-import { cloneDeep } from 'lodash' 
+import { arrayMove} from '@dnd-kit/sortable'
+import { cloneDeep } from 'lodash'
 
 import Column from './ListColumns/Column/Column'
 import Card from './ListColumns/Column/ListCards/Card/Card'
@@ -27,8 +27,10 @@ function BoardContent({ board } ) {
   const [activeDragItemId, setActiveDragItemId] = useState(null)
   const [activeDragItemType, setActiveDragItemType] = useState(null)
   const [activeDragItemData, setActiveDragItemData] = useState(null)
+  const [oldColumnWhenDraggingCard, setOldColumnWhenDraggingCard] = useState(null)
 
   useEffect(() => {
+    console.log('UseEffect board', board)
     setOrderedColumns(mapOrder(board?.columns, board?.columnOrderIds, '_id'))
   }, [board])
 
@@ -39,29 +41,71 @@ function BoardContent({ board } ) {
 
   const handleDragEnd = (event) => {
     const { active, over } = event
-    console.log('drag end', event)
 
+    if (!over || !active) return
+
+    // xu ly keo tha card
     if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.CARD) {
-      console.log('hd keo tha card va tam thoi ko lam gi ca')
-      return
+      // nếu ko tồn tại active với over (kéo linh tinh ra ngoài thì ko làm gì cả tránh crash Website)
+      const { id: activeDraggingCardId, data: { current : activeDraggingCardData} } = active
+      // over card
+      const { id: overCardId } = over
+
+      // Tìm 2 column theo card
+      const activeColumn = findColumnByCardId(activeDraggingCardId)
+      const overColumn = findColumnByCardId(overCardId)
+
+      if (!activeColumn || !overColumn) return
+      // Hanh dong keo tha card giua 2 column khac nhau
+      // phai dung toi activeDragItemData.columnId hoac activeDragItemData._id de lay columnId
+
+      if (oldColumnWhenDraggingCard._id !== overColumn._id) {
+        return
+      } else {
+        // hanh dong keo tha card trong cung 1 column
+        const oldCardIndex = oldColumnWhenDraggingCard?.cards?.findIndex(c => c._id === activeDragItemId) // lay vi tri cu tu active
+
+        const newCardIndex = overColumn?.cards?.findIndex(c => c._id === overCardId) // lay vi tri voi tu active
+        // Dung arrayMove vi keo card trong 1 cai column tuong tu voi logic keo column trong board content
+        const dndOrderedCards = arrayMove(oldColumnWhenDraggingCard?.cards, oldCardIndex, newCardIndex)
+        // console.log('dndOrderedCards', dndOrderedCards)
+        setOrderedColumns(prevColumns => {
+          const nextColumn = cloneDeep(prevColumns)
+          // Tim toi column dang tha
+          const targetColumn = nextColumn.find(column => column._id === overColumn._id)
+
+          // cap nhat 2 gia tri moi la cards va cardOrderIds cho column
+          targetColumn.cards = dndOrderedCards
+          targetColumn.cardOrderIds = dndOrderedCards.map(card => card._id)
+          // console.log('targetColumn', targetColumn)
+          // console.log('targetColumn.cards', targetColumn.cards)
+          // console.log('targetColumn.cardOrderIds', targetColumn.cardOrderIds)
+          return nextColumn
+        })
+      }
     }
 
+    // Xu ly keo tha column trong board content
+    if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) {
 
-    if (!over) return
+      if (active.id !== over.id) {
 
-    if (active.id !== over.id) {
-      const oldIndex = orderedColumns.findIndex(c => c._id === active.id) // lay vi tri cu tu active
-      const newIndex = orderedColumns.findIndex(c => c._id === over.id) // lay vi tri voi tu active
+        const oldColIndex = orderedColumns.findIndex(c => c._id === active.id) // lay vi tri cu tu active
+        const newColIndex = orderedColumns.findIndex(c => c._id === over.id) // lay vi tri voi tu active
 
-      const dndOrderedColumns = arrayMove(orderedColumns, oldIndex, newIndex)
-      // const dndOrderedColumnsIds = dndOrderedColumns.map(c => c._id) // dung de goi api cap nhat db
+        const dndOrderedColumns = arrayMove(orderedColumns, oldColIndex, newColIndex)
+        // const dndOrderedColumnsIds = dndOrderedColumns.map(c => c._id) // dung de goi api cap nhat db
 
-      setOrderedColumns(dndOrderedColumns)
+        setOrderedColumns(dndOrderedColumns)
+      }
+
     }
 
+    // Reset lại các giá trị sau khi kéo thả xong
     setActiveDragItemData(null)
     setActiveDragItemId(null)
     setActiveDragItemType(null)
+    setOldColumnWhenDraggingCard(null)
   }
   // trigger trong qua trinh keo mot item
   const handleDragOver = (event) => {
@@ -129,10 +173,14 @@ function BoardContent({ board } ) {
   }
 
   const handleDragStart = (event) => {
-    console.log('drag start', event)
     setActiveDragItemId(event?.active.id)
     setActiveDragItemType(event?.active.data.current?.columnId ? ACTIVE_DRAG_ITEM_TYPE.CARD : ACTIVE_DRAG_ITEM_TYPE.COLUMN)
     setActiveDragItemData(event?.active.data.current)
+
+    // Nếu là kéo card thì cần lưu lại column cũ để xử lý sau này
+    if (event?.active.data.current?.columnId) {
+      setOldColumnWhenDraggingCard(findColumnByCardId(event?.active?.id))
+    }
   }
 
   const customDropAnimation = {
@@ -149,6 +197,7 @@ function BoardContent({ board } ) {
   return (
     <DndContext
       sensors={mySensors}
+      collisionDetection={closestCorners}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
