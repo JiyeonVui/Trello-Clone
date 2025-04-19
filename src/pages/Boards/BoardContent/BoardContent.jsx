@@ -243,12 +243,14 @@ function BoardContent({ board } ) {
     // Tim cac diem giao nhau, diem va cham voi con tro
     const pointerIntersection = pointerWithin(args)
 
-    const intersections = pointerIntersection?.length > 0
-      ? pointerIntersection
-      : rectIntersection(args)
+    if (!pointerIntersection?.length) return
+
+    // const intersections = pointerIntersection?.length > 0
+    //   ? pointerIntersection
+    //   : rectIntersection(args)
 
     // Tim overId dau tien trong dam intersections o tren
-    let overId = getFirstCollision(intersections, 'id')
+    let overId = getFirstCollision(pointerIntersection, 'id')
 
     if (overId) {
       // fix flickering khi keo column
@@ -256,7 +258,7 @@ function BoardContent({ board } ) {
       // phát hiện va chạm closestCorners hoặc closestCenter đều đc.
       const checkColumn = orderedColumns.find(column => column._id === overId)
       if (checkColumn) {
-        console.log('overId before', overId)  
+        console.log('overId before', overId)
         overId = closestCenter({
           ...args,
           droppableContainers: args.droppableContainers.filter(container => {
