@@ -1,6 +1,7 @@
 import Box from '@mui/material/Box'
 import ListColumns from './ListColumns/ListColumns'
 import { mapOrder } from '~/utils/sorts'
+import { generatePlaceholderCard } from '~/utils/formatters'
 import {
   DndContext,
   PointerSensor,
@@ -18,7 +19,7 @@ import {
 } from '@dnd-kit/core'
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { arrayMove } from '@dnd-kit/sortable'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, isEmpty } from 'lodash'
 
 import Column from './ListColumns/Column/Column'
 import Card from './ListColumns/Column/ListCards/Card/Card'
@@ -80,8 +81,12 @@ function BoardContent({ board } ) {
       const nextOverColumns = nextColumns.find(c => c._id === overColumn._id)
       // column cũ
       if (nextActiveColumns) {
-        //
+        // Xoá card ở cái column active (cũ) đi 
         nextActiveColumns.cards = nextActiveColumns.cards.filter(c => c._id !== activeDraggingCardId)
+        // Thêm Placeholder card vào Column rỗng
+        if (isEmpty(nextActiveColumns.cards)) {
+          nextActiveColumns.cards = [generatePlaceholderCard(nextActiveColumns)]
+        }
         // câp nhật lại mảng orderIds cho chuẩn dữ liệu
         nextActiveColumns.cardOrderIds = nextActiveColumns.cards.map(card => card._id)
       }
@@ -96,6 +101,9 @@ function BoardContent({ board } ) {
         }
         // Thêm card vào column đích và cập nhật lại mảng orderIds cho chuẩn dữ liệu
         nextOverColumns.cards = nextOverColumns.cards.toSpliced(newCardIndex, 0, rebuild_activeDraggingCardData)
+
+        // Xoá Placeholder card ở column đích nếu có
+        nextOverColumns.cards = nextOverColumns.cards.filter(card => !card?.FE_PlaceholderCard) // Loc ra card ko phai la Placeholder card
 
         // cập nhật lại mảng orderIds cho chuẩn dữ liệu
         nextOverColumns.cardOrderIds = nextOverColumns.cards.map(card => card._id)
@@ -236,7 +244,7 @@ function BoardContent({ board } ) {
   }
   // args = agruments doi so thong so tham so
   const collisionDetectionStrategy = useCallback((args) => {
-    console.log('handerDragOver')
+    // console.log('handerDragOver')
     if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) {
       return closestCorners({ ...args })
     }
@@ -244,10 +252,6 @@ function BoardContent({ board } ) {
     const pointerIntersection = pointerWithin(args)
 
     if (!pointerIntersection?.length) return
-
-    // const intersections = pointerIntersection?.length > 0
-    //   ? pointerIntersection
-    //   : rectIntersection(args)
 
     // Tim overId dau tien trong dam intersections o tren
     let overId = getFirstCollision(pointerIntersection, 'id')
@@ -258,14 +262,14 @@ function BoardContent({ board } ) {
       // phát hiện va chạm closestCorners hoặc closestCenter đều đc.
       const checkColumn = orderedColumns.find(column => column._id === overId)
       if (checkColumn) {
-        console.log('overId before', overId)
+        // console.log('overId before', overId)
         overId = closestCenter({
           ...args,
           droppableContainers: args.droppableContainers.filter(container => {
             return container.id !== overId && checkColumn?.cardOrderIds?.includes(container.id)
           })[0]?.id
         })
-        console.log('overId after', overId)
+        // console.log('overId after', overId)
       }
 
       lastOverId.current = overId
