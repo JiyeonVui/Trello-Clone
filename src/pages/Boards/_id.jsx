@@ -1,6 +1,6 @@
 import Container from '@mui/material/Container'
 import AppBar from '~/components/AppBar'
-import BoardBar from '~/pages/Boards/BoardBar'
+import BoardBar from '~/pages/Boards/BoardBar/BoardBar'
 import BoardContent from '~/pages/Boards/BoardContent/BoardContent'
 import { useEffect, useState } from 'react'
 import { fetchBoardDetailsAPI } from '~/apis'
@@ -10,7 +10,7 @@ function Board() {
 
   useEffect(() => {
     // "Tam thời fix cứng boardId, flow chuẩn chỉnh về sau khi học khóa nâng cao sẽ dùng react-router-dom để lấy boardId từ url"
-    const boardId = '68076aedebfa334f1976ac09'
+    const boardId = '680884bfdc7451b44c512765'
     // call api
     fetchBoardDetailsAPI(boardId).then((board) => {
       setBoard(board)

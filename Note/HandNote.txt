@@ -13,3 +13,9 @@ Nghiên cứu thêm về toSpliced and Splice
 Nghiên cứu thêm về ArrayMove
 
 Kéo API => axios
+
+ColumnId 68088ca66d99278caee06f7f
+
+BoardId 680884bfdc7451b44c512765
+
+CardId 68088fde6d99278caee06f86 
