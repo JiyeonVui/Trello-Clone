@@ -9,6 +9,7 @@ import CommentIcon from '@mui/icons-material/Comment'
 import AttachmentIcon from '@mui/icons-material/Attachment'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { BorderColor } from '@mui/icons-material'
 
 function Card({ card }) {
 
@@ -44,7 +45,12 @@ function Card({ card }) {
         opacity: card.FE_PlaceholderCard ? '0' : '1',
         minWidth: card.FE_PlaceholderCard ? '280px' : 'unset',
         pointerEvents: card.FE_PlaceholderCard ? 'none' : 'unset',
-        position: card.FE_PlaceholderCard ? 'fixed' : 'unset'
+        position: card.FE_PlaceholderCard ? 'fixed' : 'unset',
+        border: '1px solid transparent', // cần có border mặc định để transition mượt
+        transition: 'border 0.2s ease-in-out',
+        '&:hover': {
+          border: '2px solid #3498db' // màu border khi hover
+        }
       }}
     >
       {card?.cover &&
