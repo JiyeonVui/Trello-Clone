@@ -182,7 +182,7 @@ function Column({ column }) {
               height: '100%',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between' 
+              justifyContent: 'space-between'
             }}>
               <Button startIcon={<AddCardIcon />} onClick={toggleOpenNewCardForm}>Add new card</Button>
               <Tooltip title='Drag to move'>
