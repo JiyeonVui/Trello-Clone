@@ -55,7 +55,7 @@ function Column({ column }) {
   const dndKitColumnStyles = {
     /**
      * Nếu sử dụng CSS.Transform như docs sẽ lỗi kiểu stretch
-     * https://github.com/clauderic/dnd-kit/issues/117
+     * https://github.com/clauderic/dnd-kit/issues/117 
      */
     transform: CSS.Translate.toString(transform),
     transition,
