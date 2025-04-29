@@ -5,8 +5,6 @@ import { generatePlaceholderCard } from '~/utils/formatters'
 import {
   DndContext,
   PointerSensor,
-  MouseSensor,
-  TouchSensor,
   useSensor,
   useSensors,
   DragOverlay,
@@ -14,9 +12,10 @@ import {
   closestCorners,
   closestCenter,
   pointerWithin,
-  rectIntersection,
   getFirstCollision
 } from '@dnd-kit/core'
+
+import { MouseSensor, TouchSensor } from '~/customLib/DndKitSensors'
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { arrayMove } from '@dnd-kit/sortable'
 import { cloneDeep, isEmpty } from 'lodash'
