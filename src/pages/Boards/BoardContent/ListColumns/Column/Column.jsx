@@ -22,6 +22,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import { mapOrder } from '~/utils/sorts'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { toast } from 'react-toastify'
 
 
 function Column({ column }) {
@@ -36,7 +37,7 @@ function Column({ column }) {
   const [newCardTitle, setNewCardTitle] = useState('')
   const addNewCard = () => {
     if (!newCardTitle) {
-      console.error('Please enter Column title!')
+      toast.error('Please enter Column title!' , { position: 'bottom-right' })
       return
     }
 
@@ -55,7 +56,7 @@ function Column({ column }) {
   const dndKitColumnStyles = {
     /**
      * Nếu sử dụng CSS.Transform như docs sẽ lỗi kiểu stretch
-     * https://github.com/clauderic/dnd-kit/issues/117
+     * https://github.com/clauderic/dnd-kit/issues/117 
      */
     transform: CSS.Translate.toString(transform),
     transition,
@@ -201,6 +202,7 @@ function Column({ column }) {
                 type="text"
                 size='small'
                 autoFocus
+                data-no-dnd = 'true'
                 value={newCardTitle}
                 onChange={(e) => setNewCardTitle(e.target.value)}
                 sx={{
