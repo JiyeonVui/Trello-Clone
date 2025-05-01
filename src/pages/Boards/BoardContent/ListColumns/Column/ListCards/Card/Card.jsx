@@ -9,7 +9,6 @@ import CommentIcon from '@mui/icons-material/Comment'
 import AttachmentIcon from '@mui/icons-material/Attachment'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { BorderColor } from '@mui/icons-material'
 
 function Card({ card }) {
 

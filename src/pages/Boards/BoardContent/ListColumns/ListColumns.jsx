@@ -9,7 +9,7 @@ import { toast } from 'react-toastify'
 import TextField from '@mui/material/TextField'
 import CloseIcon from '@mui/icons-material/Close'
 
-function ListColumns({ columns }) {
+function ListColumns({ columns, createNewColumn, createNewCard }) {
   /**
    * SortableContext yêu cầu items là một mảng dạng ['id-1', 'id-2'] chứ ko phải
    * [{id: 'id-1'}, {id: 'id-2'}]
@@ -19,13 +19,18 @@ function ListColumns({ columns }) {
   const [openNewColumnForm, setOpenNewColumnForm] = useState(false)
   const toggleOpenNewColumnForm = () => setOpenNewColumnForm(!openNewColumnForm)
   const [newColumntTitle, setNewColumnTitle] = useState('')
-  const addNewColumn = () => {
+  const addNewColumn = async () => {
     if (!newColumntTitle) {
       toast.error('Please enter Column title!')
       return
     }
-
+    // Tạo dữ liệu Column để gọi API
+    const newColumnData = {
+      title: newColumntTitle
+    }
     // Gọi Api ở đây...
+    console.log('create new column')
+    await createNewColumn(newColumnData)
 
     // Đóng trạng thái thêm Column mới & Clear Input
     toggleOpenNewColumnForm()
@@ -47,7 +52,11 @@ function ListColumns({ columns }) {
       >
         {columns?.map(( column ) => {
           return (
-            <Column key={column._id} column={column}/>
+            <Column
+              key={column._id}
+              column={column}
+              createNewCard={createNewCard}
+            />
           )
         })}
         {!openNewColumnForm
@@ -132,11 +141,8 @@ function ListColumns({ columns }) {
             </Box>
           </Box>
         }
-
-
       </Box>
     </SortableContext>
-
   )
 }
 

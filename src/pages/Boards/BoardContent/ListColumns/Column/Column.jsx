@@ -25,7 +25,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { toast } from 'react-toastify'
 
 
-function Column({ column }) {
+function Column({ column, createNewCard }) {
 
   const [anchorEl, setAnchorEl] = React.useState(null)
   const open = Boolean(anchorEl)
@@ -35,13 +35,18 @@ function Column({ column }) {
   const [openNewCardForm, setOpenNewCardForm] = useState(false)
   const toggleOpenNewCardForm = () => setOpenNewCardForm(!openNewCardForm)
   const [newCardTitle, setNewCardTitle] = useState('')
-  const addNewCard = () => {
+
+  const addNewCard = async () => {
     if (!newCardTitle) {
       toast.error('Please enter Column title!' , { position: 'bottom-right' })
       return
     }
 
     // Gọi Api ở đây...
+    await createNewCard({
+      title: newCardTitle,
+      columnId: column._id
+    })
 
     // Đóng trạng thái thêm Column mới & Clear Input
     toggleOpenNewCardForm()

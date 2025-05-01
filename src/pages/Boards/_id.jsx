@@ -3,28 +3,54 @@ import AppBar from '~/components/AppBar/AppBar'
 import BoardBar from '~/pages/Boards/BoardBar/BoardBar'
 import BoardContent from '~/pages/Boards/BoardContent/BoardContent'
 import { useEffect, useState } from 'react'
-import { fetchBoardDetailsAPI } from '~/apis'
-import { mockData } from '~/apis/mock-data'
+import { fetchBoardDetailsAPI, createNewColumnAPI, createNewCardAPI } from '~/apis'
+// import { mockData } from '~/apis/mock-data'
+
 function Board() {
   const [board, setBoard] = useState(null)
 
   useEffect(() => {
     // "Tam thời fix cứng boardId, flow chuẩn chỉnh về sau khi học khóa nâng cao sẽ dùng react-router-dom để lấy boardId từ url"
-    // const boardId = '680884bfdc7451b44c512765'
+    const boardId = '6812ed16e2c5743515586cc4'
     // call api
-    // fetchBoardDetailsAPI(boardId).then((board) => {
-    //   setBoard(board)
-    // })
+    fetchBoardDetailsAPI(boardId).then((board) => {
+      setBoard(board)
+    })
 
   }, [])
+
+  const createNewColumn = async (newColumnData) => {
+    const createdColumn = await createNewColumnAPI({
+      ...newColumnData,
+      boardId: board._id
+    })
+    console.log('createdColumn', createdColumn)
+
+    // Cập nhật state board
+
+  }
+
+  const createNewCard = async (newCardData) => {
+    const createdCard = await createNewCardAPI({
+      ...newCardData,
+      boardId: board._id
+    })
+    console.log('createdCard', createdCard)
+    // Cập nhật state board
+  }
+
 
   return (
     <Container disableGutters maxWidth={false} sx={{
       height: '100vh'
     }}>
       <AppBar />
-      <BoardBar board={mockData?.board} />
-      <BoardContent board={mockData?.board} />
+      <BoardBar board={board} />
+      <BoardContent
+        board={board}
+        createNewColumn={createNewColumn}
+        createNewCard={createNewCard}
+      />
       {/* <VideoPlayer /> */}
     </Container>
   )

@@ -10,10 +10,21 @@ import { API_ROOT } from '~/utils/constants'
  * Hiểu đơn giản Interceptor là cách mà chúng ta đánh chặn giữa request hoặc response để xử lý logic mà chúng ta muốn.
  * Sẽ có ở Mern Stack advanced khóa học sau.
  */
-
+/** Boards */
 export const fetchBoardDetailsAPI = async (boardId) => {
   const response = await axios.get(`${API_ROOT}/v1/boards/${boardId}`)
-  console.log('response', response.data)
+  // console.log('response', response.data)
   return response.data
 }
 
+/** Columns */
+export const createNewColumnAPI = async ( newColumnData) => {
+  const response = await axios.post(`${API_ROOT}/v1/columns`, newColumnData)
+  return response.data
+}
+
+/** Cards */
+export const createNewCardAPI = async ( newColumnData) => {
+  const response = await axios.post(`${API_ROOT}/v1/cards`, newColumnData)
+  return response.data
+}
