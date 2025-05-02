@@ -27,7 +27,10 @@ function Board() {
     console.log('createdColumn', createdColumn)
 
     // Cập nhật state board
-
+    const newBoard = { ...board }
+    newBoard.columns.push(createdColumn)
+    newBoard.columnOrderIds.push(createdColumn._id)
+    setBoard(newBoard)
   }
 
   const createNewCard = async (newCardData) => {
@@ -37,6 +40,15 @@ function Board() {
     })
     console.log('createdCard', createdCard)
     // Cập nhật state board
+    const newBoard = { ...board }
+    const columnToUpdate = newBoard.columns.find(column => column._id === createdCard.columnId)
+
+    if (columnToUpdate) {
+      columnToUpdate.cards.push(createdCard)
+      columnToUpdate.cardOrderIds.push(createdCard._id)
+    }
+
+    setBoard(newBoard)
   }
 
 
