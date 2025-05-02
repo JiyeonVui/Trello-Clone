@@ -4,6 +4,8 @@ import BoardBar from '~/pages/Boards/BoardBar/BoardBar'
 import BoardContent from '~/pages/Boards/BoardContent/BoardContent'
 import { useEffect, useState } from 'react'
 import { fetchBoardDetailsAPI, createNewColumnAPI, createNewCardAPI } from '~/apis'
+import { generatePlaceholderCard } from '~/utils/formatters'
+import { isEmpty } from 'lodash'
 // import { mockData } from '~/apis/mock-data'
 
 function Board() {
@@ -14,6 +16,12 @@ function Board() {
     const boardId = '6812ed16e2c5743515586cc4'
     // call api
     fetchBoardDetailsAPI(boardId).then((board) => {
+      board.columns.forEach( column => {
+        if (isEmpty(column.cards)) {
+          column.cards = [generatePlaceholderCard(column)]
+          column.cardOrderIds = [generatePlaceholderCard(column)._id]
+        }
+      })
       setBoard(board)
     })
 
@@ -25,6 +33,9 @@ function Board() {
       boardId: board._id
     })
     console.log('createdColumn', createdColumn)
+
+    createdColumn.cards = [generatePlaceholderCard(createdColumn)]
+    createdColumn.cardOrderIds = [generatePlaceholderCard(createdColumn)._id]
 
     // Cập nhật state board
     const newBoard = { ...board }
