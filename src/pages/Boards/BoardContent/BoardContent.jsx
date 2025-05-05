@@ -28,7 +28,7 @@ const ACTIVE_DRAG_ITEM_TYPE = {
   CARD: 'ACTIVE_DRAG_ITEM_TYPE_CARD'
 }
 
-function BoardContent({ board, createNewColumn, createNewCard } ) {
+function BoardContent({ board, createNewColumn, createNewCard, moveColumns, moveCardInTheSameColumn } ) {
 
   // https://docs.dndkit.com/api-documentation/sensors
   const pointerSensor = useSensor(PointerSensor, { activationConstraint: { distance: 10 } })
@@ -47,7 +47,7 @@ function BoardContent({ board, createNewColumn, createNewCard } ) {
   const lastOverId = useRef(null)
 
   useEffect(() => {
-    setOrderedColumns(mapOrder(board?.columns, board?.columnOrderIds, '_id'))
+    setOrderedColumns(board.columns)
   }, [board])
 
   // Tìm 1 cái column theo cardId
@@ -149,7 +149,10 @@ function BoardContent({ board, createNewColumn, createNewCard } ) {
         const newCardIndex = overColumn?.cards?.findIndex(c => c._id === overCardId) // lay vi tri voi tu active
         // Dung arrayMove vi keo card trong 1 cai column tuong tu voi logic keo column trong board content
         const dndOrderedCards = arrayMove(oldColumnWhenDraggingCard?.cards, oldCardIndex, newCardIndex)
+        const dndOrderedCardIds = dndOrderedCards.map(card => card._id)
         // console.log('dndOrderedCards', dndOrderedCards)
+        // van goi update State o day de tranh delay hoac flickering giao dien luc keo tha
+
         setOrderedColumns(prevColumns => {
           const nextColumn = cloneDeep(prevColumns)
           // Tim toi column dang tha
@@ -157,9 +160,11 @@ function BoardContent({ board, createNewColumn, createNewCard } ) {
 
           // cap nhat 2 gia tri moi la cards va cardOrderIds cho column
           targetColumn.cards = dndOrderedCards
-          targetColumn.cardOrderIds = dndOrderedCards.map(card => card._id)
+          targetColumn.cardOrderIds = dndOrderedCardIds
           return nextColumn
         })
+
+        moveCardInTheSameColumn(dndOrderedCards, dndOrderedCardIds, oldColumnWhenDraggingCard._id)
       }
     }
 
@@ -173,9 +178,10 @@ function BoardContent({ board, createNewColumn, createNewCard } ) {
 
         const dndOrderedColumns = arrayMove(orderedColumns, oldColIndex, newColIndex)
 
+        moveColumns(dndOrderedColumns)
+        // van goi update State o day de tranh delay or flickering giao dien
         setOrderedColumns(dndOrderedColumns)
       }
-
     }
 
     // Reset lại các giá trị sau khi kéo thả xong

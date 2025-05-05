@@ -19,3 +19,7 @@ ColumnId 68088ca66d99278caee06f7f
 BoardId 680884bfdc7451b44c512765
 
 CardId 68088fde6d99278caee06f86 
+
+
+Back-end 
+=> Tim hieu them ve Object.keys (jv)
