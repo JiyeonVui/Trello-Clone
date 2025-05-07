@@ -28,7 +28,14 @@ const ACTIVE_DRAG_ITEM_TYPE = {
   CARD: 'ACTIVE_DRAG_ITEM_TYPE_CARD'
 }
 
-function BoardContent({ board, createNewColumn, createNewCard, moveColumns, moveCardInTheSameColumn } ) {
+function BoardContent({
+  board,
+  createNewColumn,
+  createNewCard,
+  moveColumns,
+  moveCardInTheSameColumn,
+  moveCardToDifferentColumn
+}) {
 
   // https://docs.dndkit.com/api-documentation/sensors
   const pointerSensor = useSensor(PointerSensor, { activationConstraint: { distance: 10 } })
@@ -62,8 +69,10 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns, move
     over,
     activeColumn,
     activeDraggingCardId,
-    activeDraggingCardData
+    activeDraggingCardData,
+    triggerFrom
   ) => {
+
     setOrderedColumns(prevColumns => {
       // Tìm vị trí index của cái overcard trong column đích (nơi card sẽ thả vào)
       const overCardIndex = overColumn?.cards?.findIndex(c => c._id === overCardId)
@@ -108,6 +117,16 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns, move
         nextOverColumns.cardOrderIds = nextOverColumns.cards.map(card => card._id)
       }
 
+      if (triggerFrom === 'handleDragEnd') {
+        // xu ly goi api drag card giua 2 column
+        moveCardToDifferentColumn(
+          activeDraggingCardId,
+          overColumn._id,
+          nextOverColumns._id,
+          nextColumns
+        )
+      }
+
       return nextColumns
     })
   }
@@ -140,7 +159,8 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns, move
           over,
           activeColumn,
           activeDraggingCardId,
-          activeDraggingCardData
+          activeDraggingCardData,
+          'handleDragEnd'
         )
       } else {
         // hanh dong keo tha card trong cung 1 column
@@ -222,7 +242,8 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns, move
         over,
         activeColumn,
         activeDraggingCardId,
-        activeDraggingCardData
+        activeDraggingCardData,
+        'handleDragOver'
       )
     }
   }

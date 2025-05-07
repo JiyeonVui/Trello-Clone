@@ -9,7 +9,8 @@ import {
   createNewColumnAPI,
   createNewCardAPI,
   updateBoardDetailsAPI,
-  updateColumnDetailsAPI
+  updateColumnDetailsAPI,
+  moveCardToDifferentColumnAPI
 } from '~/apis'
 import { mapOrder } from '~/utils/sorts'
 import { generatePlaceholderCard } from '~/utils/formatters'
@@ -24,7 +25,7 @@ function Board() {
 
   useEffect(() => {
     // "Tam thời fix cứng boardId, flow chuẩn chỉnh về sau khi học khóa nâng cao sẽ dùng react-router-dom để lấy boardId từ url"
-    const boardId = '6812ed16e2c5743515586cc4'
+    const boardId = '6819e85b225d908ed820c1c5'
 
     // call api
     fetchBoardDetailsAPI(boardId).then((board) => {
@@ -88,20 +89,65 @@ function Board() {
     updateColumnDetailsAPI(columnId, { cardOrderIds: dndOrderedCardIds })
 
   }
+  /**
+   * Khi move card giữa 2 column khác nhau
+   * 3 bước
+   * Cập nhật lại orderIds và card của column đầu tiên chứa nó
+   * Cập nhật lại mang CardOrderIds của column tiếp theo 
+   * Cập nhật lại trường ColumnId mới của cái card đã kéo
+   */
+  const moveCardToDifferentColumn = (currentCardId, prevColumnId, nextColumnId, dndOrderedColumns) => {
+    console.log('MoveCardToDifferent')
+
+    console.log('currentCardId',currentCardId)
+    console.log('prevColumnId',prevColumnId)
+    console.log('nextColumnId',nextColumnId)
+    console.log('dndOrderedColumns',dndOrderedColumns)
+
+    const dndOrderedColumnIds = dndOrderedColumns.map( c => c._id)
+
+    const newBoard = { ...board }
+    newBoard.columns = dndOrderedColumns
+    newBoard.columnOrderIds = dndOrderedColumnIds
+    setBoard(board)
+
+    let prevCardOderIds = dndOrderedColumns.find(c => c._id === prevColumnId)?.cardOrderIds
+
+    if ( prevCardOderIds[0].includes('placeholder-card')) {
+      prevCardOderIds = []
+    }
+
+    // goi API update Board
+    moveCardToDifferentColumnAPI({
+      currentCardId,
+      prevColumnId,
+      prevCardOderIds,
+      nextColumnId,
+      nextCardOrderIds: dndOrderedColumns.find(c => c._id === nextColumnId)?.cardOrderIds
+    })
+  }
 
   const createNewCard = async (newCardData) => {
     const createdCard = await createNewCardAPI({
       ...newCardData,
       boardId: board._id
     })
-    console.log('createdCard', createdCard)
+    // console.log('createdCard', createdCard)
     // Cập nhật state board
     const newBoard = { ...board }
     const columnToUpdate = newBoard.columns.find(column => column._id === createdCard.columnId)
 
     if (columnToUpdate) {
-      columnToUpdate.cards.push(createdCard)
-      columnToUpdate.cardOrderIds.push(createdCard._id)
+      // neu column rong ban chan la dang chua placeholdercard can phai xoa di
+      if (columnToUpdate.cards.some(card => card.FE_PlaceholderCard)) {
+        columnToUpdate.cards.push(createdCard)
+        columnToUpdate.cardOrderIds.push(createdCard._id)
+      }
+      else {
+        columnToUpdate.cards = [createdCard]
+        columnToUpdate.cardOrderIds = [createdCard._id]
+      }
+
     }
 
     setBoard(newBoard)
@@ -136,6 +182,7 @@ function Board() {
         createNewCard={createNewCard}
         moveColumns={moveColumns}
         moveCardInTheSameColumn={moveCardInTheSameColumn}
+        moveCardToDifferentColumn={moveCardToDifferentColumn}
       />
       {/* <VideoPlayer /> */}
     </Container>
