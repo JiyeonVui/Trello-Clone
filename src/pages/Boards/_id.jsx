@@ -10,14 +10,14 @@ import {
   createNewCardAPI,
   updateBoardDetailsAPI,
   updateColumnDetailsAPI,
-  moveCardToDifferentColumnAPI
+  moveCardToDifferentColumnAPI,
+  deleteColumnDetailsAPI
 } from '~/apis'
 import { mapOrder } from '~/utils/sorts'
 import { generatePlaceholderCard } from '~/utils/formatters'
 import { isEmpty } from 'lodash'
-import CircularProgress from '@mui/material/CircularProgress'
-import { Typography } from '@mui/material'
 import Box from '@mui/material/Box'
+import { toast } from 'react-toastify'
 // import { mockData } from '~/apis/mock-data'
 
 function Board() {
@@ -25,7 +25,7 @@ function Board() {
 
   useEffect(() => {
     // "Tam thời fix cứng boardId, flow chuẩn chỉnh về sau khi học khóa nâng cao sẽ dùng react-router-dom để lấy boardId từ url"
-    const boardId = '6819e85b225d908ed820c1c5'
+    const boardId = '681c7468c5e7e4c12974fd8d'
 
     // call api
     fetchBoardDetailsAPI(boardId).then((board) => {
@@ -97,12 +97,6 @@ function Board() {
    * Cập nhật lại trường ColumnId mới của cái card đã kéo
    */
   const moveCardToDifferentColumn = (currentCardId, prevColumnId, nextColumnId, dndOrderedColumns) => {
-    console.log('MoveCardToDifferent')
-
-    console.log('currentCardId',currentCardId)
-    console.log('prevColumnId',prevColumnId)
-    console.log('nextColumnId',nextColumnId)
-    console.log('dndOrderedColumns',dndOrderedColumns)
 
     const dndOrderedColumnIds = dndOrderedColumns.map( c => c._id)
 
@@ -112,8 +106,10 @@ function Board() {
     setBoard(board)
 
     let prevCardOderIds = dndOrderedColumns.find(c => c._id === prevColumnId)?.cardOrderIds
+    console.log('🚀 ~ moveCardToDifferentColumn ~ prevCardOderIds:', prevCardOderIds)
 
     if ( prevCardOderIds[0].includes('placeholder-card')) {
+      console.log('Empty event')
       prevCardOderIds = []
     }
 
@@ -147,10 +143,21 @@ function Board() {
         columnToUpdate.cards = [createdCard]
         columnToUpdate.cardOrderIds = [createdCard._id]
       }
-
     }
-
     setBoard(newBoard)
+  }
+
+  // Xu ly xoa column va card ben trong no
+  const deleteColumnDetails = ( columnId ) => {
+    // update du lieu state board
+    const newBoard = { ...board }
+    newBoard.columns = newBoard.columns.filter(c => c._id !== columnId)
+    newBoard.columnOrderIds = newBoard.columnOrderIds.filter( _id => _id !== columnId)
+    setBoard(newBoard)
+    // goi api xu ly ben BE
+    deleteColumnDetailsAPI(columnId).then(res => {
+      toast.success(res?.deleteResult)
+    })
   }
 
   if ( !board ) {
@@ -178,11 +185,13 @@ function Board() {
       <BoardBar board={board} />
       <BoardContent
         board={board}
+
         createNewColumn={createNewColumn}
         createNewCard={createNewCard}
         moveColumns={moveColumns}
         moveCardInTheSameColumn={moveCardInTheSameColumn}
         moveCardToDifferentColumn={moveCardToDifferentColumn}
+        deleteColumnDetails={deleteColumnDetails}
       />
       {/* <VideoPlayer /> */}
     </Container>

@@ -34,7 +34,8 @@ function BoardContent({
   createNewCard,
   moveColumns,
   moveCardInTheSameColumn,
-  moveCardToDifferentColumn
+  moveCardToDifferentColumn,
+  deleteColumnDetails
 }) {
 
   // https://docs.dndkit.com/api-documentation/sensors
@@ -89,7 +90,7 @@ function BoardContent({
       const nextOverColumns = nextColumns.find(c => c._id === overColumn._id)
       // column cũ
       if (nextActiveColumns) {
-        // Xoá card ở cái column active (cũ) đi 
+        // Xoá card ở cái column active (cũ) đi
         nextActiveColumns.cards = nextActiveColumns.cards.filter(c => c._id !== activeDraggingCardId)
         // Thêm Placeholder card vào Column rỗng
         if (isEmpty(nextActiveColumns.cards)) {
@@ -121,7 +122,7 @@ function BoardContent({
         // xu ly goi api drag card giua 2 column
         moveCardToDifferentColumn(
           activeDraggingCardId,
-          overColumn._id,
+          oldColumnWhenDraggingCard._id,
           nextOverColumns._id,
           nextColumns
         )
@@ -326,6 +327,7 @@ function BoardContent({
           columns= {orderedColumns}
           createNewColumn={createNewColumn}
           createNewCard={createNewCard}
+          deleteColumnDetails={deleteColumnDetails}
         />
         <DragOverlay
           dropAnimation={customDropAnimation}
