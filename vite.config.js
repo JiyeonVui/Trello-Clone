@@ -5,6 +5,9 @@ import svgr from 'vite-plugin-svgr'
 export default defineConfig({
   plugins: [react(), svgr({
     svgrOptions: {
+      define: {
+        'process.env': process.env
+      },
       plugins: ["@svgr/plugin-svgo", "@svgr/plugin-jsx"],
       svgoConfig: {
         floatPrecision: 2,
