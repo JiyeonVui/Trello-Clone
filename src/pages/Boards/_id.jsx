@@ -25,7 +25,7 @@ function Board() {
 
   useEffect(() => {
     // "Tam thời fix cứng boardId, flow chuẩn chỉnh về sau khi học khóa nâng cao sẽ dùng react-router-dom để lấy boardId từ url"
-    const boardId = '682303e648e36528b4969503'
+    const boardId = '68234e2f33c25b73b16e0a2d'
 
     // call api
     fetchBoardDetailsAPI(boardId).then((board) => {
@@ -112,7 +112,7 @@ function Board() {
       console.log('Empty event')
       prevCardOrderIds = []
     }
-
+    console.log('🚀 ~ moveCardToDifferentColumn ~ nextColumnId:', nextColumnId)
     // goi API update Board
     moveCardToDifferentColumnAPI({
       currentCardId,
