@@ -25,7 +25,7 @@ function Board() {
 
   useEffect(() => {
     // "Tam thời fix cứng boardId, flow chuẩn chỉnh về sau khi học khóa nâng cao sẽ dùng react-router-dom để lấy boardId từ url"
-    const boardId = '6822f684c385c6efe61ddcea'
+    const boardId = '682303e648e36528b4969503'
 
     // call api
     fetchBoardDetailsAPI(boardId).then((board) => {
@@ -105,19 +105,19 @@ function Board() {
     newBoard.columnOrderIds = dndOrderedColumnIds
     setBoard(board)
 
-    let prevCardOderIds = dndOrderedColumns.find(c => c._id === prevColumnId)?.cardOrderIds
-    console.log('🚀 ~ moveCardToDifferentColumn ~ prevCardOderIds:', prevCardOderIds)
+    let prevCardOrderIds = dndOrderedColumns.find(c => c._id === prevColumnId)?.cardOrderIds
+    console.log('🚀 ~ moveCardToDifferentColumn ~ prevCardOderIds:', prevCardOrderIds)
 
-    if ( prevCardOderIds[0].includes('placeholder-card')) {
+    if ( prevCardOrderIds[0].includes('placeholder-card')) {
       console.log('Empty event')
-      prevCardOderIds = []
+      prevCardOrderIds = []
     }
 
     // goi API update Board
     moveCardToDifferentColumnAPI({
       currentCardId,
       prevColumnId,
-      prevCardOderIds,
+      prevCardOrderIds,
       nextColumnId,
       nextCardOrderIds: dndOrderedColumns.find(c => c._id === nextColumnId)?.cardOrderIds
     })
