@@ -7,13 +7,11 @@ import { useEffect } from 'react'
 import {
   updateBoardDetailsAPI,
   updateColumnDetailsAPI,
-  moveCardToDifferentColumnAPI,
-  deleteColumnDetailsAPI
+  moveCardToDifferentColumnAPI
 } from '~/apis'
 
 import { cloneDeep } from 'lodash'
 import Box from '@mui/material/Box'
-import { toast } from 'react-toastify'
 import {
   fetchBoardDetailsAPI,
   updateCurrentActiveBoard,
@@ -136,9 +134,6 @@ function Board() {
       <BoardBar board={board} />
       <BoardContent
         board={board}
-
-        // deleteColumnDetails={deleteColumnDetails}
-
         moveColumns={moveColumns}
         moveCardInTheSameColumn={moveCardInTheSameColumn}
         moveCardToDifferentColumn={moveCardToDifferentColumn}
