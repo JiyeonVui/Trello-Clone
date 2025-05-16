@@ -19,15 +19,25 @@ import DragHandleIcon from '@mui/icons-material/DragHandle'
 import ListCards from './ListCards/ListCards'
 import TextField from '@mui/material/TextField'
 import CloseIcon from '@mui/icons-material/Close'
-import { mapOrder } from '~/utils/sorts'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { toast } from 'react-toastify'
 import { useConfirm } from 'material-ui-confirm'
+import {
+  createNewCardAPI,
+  deleteColumnDetailsAPI
+} from '~/apis'
+import { cloneDeep } from 'lodash'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+  updateCurrentActiveBoard,
+  selectCurrentActiveBoard
+} from '~/redux/activeBoard/activeBoardSlice'
 
+function Column({ column }) {
 
-function Column({ column, createNewCard, deleteColumnDetails }) {
-
+  const dispatch = useDispatch()
+  const board = useSelector(selectCurrentActiveBoard)
   const [anchorEl, setAnchorEl] = React.useState(null)
   const open = Boolean(anchorEl)
   const handleClick = (event) => setAnchorEl(event.currentTarget)
@@ -37,17 +47,39 @@ function Column({ column, createNewCard, deleteColumnDetails }) {
   const toggleOpenNewCardForm = () => setOpenNewCardForm(!openNewCardForm)
   const [newCardTitle, setNewCardTitle] = useState('')
 
-  const addNewCard = () => {
+  const addNewCard = async () => {
     if (!newCardTitle) {
-      toast.error('Please enter Column title!' , { position: 'bottom-right' })
+      toast.error('Please enter Column title!', { position: 'bottom-right' })
       return
     }
 
-    // Gọi Api ở đây...
-    createNewCard({
+    const newCardData = {
       title: newCardTitle,
       columnId: column._id
+    }
+
+    // Gọi Api ở đây...
+    const createdCard = await createNewCardAPI({
+      ...newCardData,
+      boardId: board._id
     })
+    // console.log('createdCard', createdCard)
+    // Cập nhật state board
+    const newBoard = cloneDeep(board)
+    const columnToUpdate = newBoard.columns.find(column => column._id === createdCard.columnId)
+
+    if (columnToUpdate) {
+      // neu column rong ban chan la dang chua placeholdercard can phai xoa di
+      if (columnToUpdate.cards.some(card => card.FE_PlaceholderCard)) {
+        columnToUpdate.cards.push(createdCard)
+        columnToUpdate.cardOrderIds.push(createdCard._id)
+      }
+      else {
+        columnToUpdate.cards = [createdCard]
+        columnToUpdate.cardOrderIds = [createdCard._id]
+      }
+    }
+    dispatch(updateCurrentActiveBoard(newBoard))
 
     // Đóng trạng thái thêm Column mới & Clear Input
     toggleOpenNewCardForm()
@@ -68,7 +100,18 @@ function Column({ column, createNewCard, deleteColumnDetails }) {
       // confirmationButtonProps: { color: 'secondary', variant: 'outlined' },
 
     }).then( () => {
-      deleteColumnDetails(column._id)
+      // deleteColumnDetails(column._id)
+      // update du lieu state board
+      // const newBoard = { ...board }
+      const columnId = column._id
+      const newBoard = cloneDeep(board)
+      newBoard.columns = newBoard.columns.filter(c => c._id !== columnId)
+      newBoard.columnOrderIds = newBoard.columnOrderIds.filter( _id => _id !== columnId)
+      dispatch(updateCurrentActiveBoard(newBoard))
+      // goi api xu ly ben BE
+      deleteColumnDetailsAPI(columnId).then(res => {
+        toast.success(res?.deleteResult)
+      })
     }
     ).catch(() => {})
   }
@@ -81,7 +124,7 @@ function Column({ column, createNewCard, deleteColumnDetails }) {
   const dndKitColumnStyles = {
     /**
      * Nếu sử dụng CSS.Transform như docs sẽ lỗi kiểu stretch
-     * https://github.com/clauderic/dnd-kit/issues/117 
+     * https://github.com/clauderic/dnd-kit/issues/117
      */
     transform: CSS.Translate.toString(transform),
     transition,

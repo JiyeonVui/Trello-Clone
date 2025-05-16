@@ -11,11 +11,12 @@ import { API_ROOT } from '~/utils/constants'
  * Sẽ có ở Mern Stack advanced khóa học sau.
  */
 /** Boards */
-export const fetchBoardDetailsAPI = async (boardId) => {
-  const response = await axios.get(`${API_ROOT}/v1/boards/${boardId}`)
-  // console.log('response', response.data)
-  return response.data
-}
+// Đã move vào redux
+// export const fetchBoardDetailsAPI = async (boardId) => {
+//   const response = await axios.get(`${API_ROOT}/v1/boards/${boardId}`)
+//   // console.log('response', response.data)
+//   return response.data
+// }
 
 export const updateBoardDetailsAPI = async (boardId, updateData) => {
   const response = await axios.put(`${API_ROOT}/v1/boards/${boardId}`, updateData)

@@ -8,14 +8,26 @@ import { useState } from 'react'
 import { toast } from 'react-toastify'
 import TextField from '@mui/material/TextField'
 import CloseIcon from '@mui/icons-material/Close'
+import {
+  createNewColumnAPI
+} from '~/apis'
+import { generatePlaceholderCard } from '~/utils/formatters'
+import { cloneDeep } from 'lodash'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+  updateCurrentActiveBoard,
+  selectCurrentActiveBoard
+} from '~/redux/activeBoard/activeBoardSlice'
 
-function ListColumns({ columns, createNewColumn, createNewCard, deleteColumnDetails }) {
+function ListColumns({ columns }) {
   /**
    * SortableContext yêu cầu items là một mảng dạng ['id-1', 'id-2'] chứ ko phải
    * [{id: 'id-1'}, {id: 'id-2'}]
    * Nếu không đúng thì vẫn kéo thả đc nhưng ko có animation
    * https://github.com/clauderic/dnd-kit/issues/183#issuecomment-812569512
    */
+  const dispatch = useDispatch()
+  const board = useSelector(selectCurrentActiveBoard)
   const [openNewColumnForm, setOpenNewColumnForm] = useState(false)
   const toggleOpenNewColumnForm = () => setOpenNewColumnForm(!openNewColumnForm)
   const [newColumntTitle, setNewColumnTitle] = useState('')
@@ -28,9 +40,33 @@ function ListColumns({ columns, createNewColumn, createNewCard, deleteColumnDeta
     const newColumnData = {
       title: newColumntTitle
     }
-    // Gọi Api ở đây...
-    console.log('create new column')
-    await createNewColumn(newColumnData)
+
+    const createdColumn = await createNewColumnAPI({
+      ...newColumnData,
+      boardId: board._id
+    })
+
+    createdColumn.cards = [generatePlaceholderCard(createdColumn)]
+    createdColumn.cardOrderIds = [generatePlaceholderCard(createdColumn)._id]
+
+    /**
+     * Đoạn này sẽ dính lỗi object is not extensible bởi dù đã copy/clone ra 1 newBoard nhưng bản chất
+     * của spread operator là shallow copy, nên dính phải rules immutable của redux tookit ko dùng được
+     * hàm push() (sửa giá trị trực tiếp vào object), cách đơn giản nhanh gọn nhất là dùng Deep copy toàn
+     * bộ cái Board cho dễ hiểu và code ngăn gọn hơn
+     */
+
+
+    // Cập nhật state board
+    const newBoard = cloneDeep(board)
+    newBoard.columns.push(createdColumn)
+    newBoard.columnOrderIds.push(createdColumn._id)
+
+    /**
+     * có 1 cách khác là dùng array.concat() để thay cho hàm push() => nó sẽ tạo ra 1 mảng mới bằng cách merge 2 mảng lại với nhau.
+     */
+
+    dispatch(updateCurrentActiveBoard(newBoard))
 
     // Đóng trạng thái thêm Column mới & Clear Input
     toggleOpenNewColumnForm()
@@ -55,8 +91,6 @@ function ListColumns({ columns, createNewColumn, createNewCard, deleteColumnDeta
             <Column
               key={column._id}
               column={column}
-              createNewCard={createNewCard}
-              deleteColumnDetails={deleteColumnDetails}
             />
           )
         })}

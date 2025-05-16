@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box'
 import ListColumns from './ListColumns/ListColumns'
-import { mapOrder } from '~/utils/sorts'
 import { generatePlaceholderCard } from '~/utils/formatters'
 import {
   DndContext,
@@ -30,16 +29,13 @@ const ACTIVE_DRAG_ITEM_TYPE = {
 
 function BoardContent({
   board,
-  createNewColumn,
-  createNewCard,
   moveColumns,
   moveCardInTheSameColumn,
-  moveCardToDifferentColumn,
-  deleteColumnDetails
+  moveCardToDifferentColumn
 }) {
 
   // https://docs.dndkit.com/api-documentation/sensors
-  const pointerSensor = useSensor(PointerSensor, { activationConstraint: { distance: 10 } })
+  // const pointerSensor = useSensor(PointerSensor, { activationConstraint: { distance: 10 } })
   const mouseSensor = useSensor(MouseSensor, { activationConstraint: { distance: 10 } })
   const touchSensor = useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 500 } })
   const mySensors = useSensors(mouseSensor, touchSensor)
@@ -325,9 +321,6 @@ function BoardContent({
       }}>
         <ListColumns
           columns= {orderedColumns}
-          createNewColumn={createNewColumn}
-          createNewCard={createNewCard}
-          deleteColumnDetails={deleteColumnDetails}
         />
         <DragOverlay
           dropAnimation={customDropAnimation}
